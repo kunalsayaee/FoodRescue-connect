@@ -1,0 +1,17 @@
+{% macro badge(status) %}<span class="badge badge-{{ status }}">{{ status|replace('_', ' ') }}</span>{% endmacro %}
+
+{% macro listing_row(r, show_distance=False) %}
+{% set m = r.expires_at|minutes_left %}
+<a class="ticket" href="{{ url_for('main.detail', listing_id=r.id) }}">
+  <div class="ticket-main">
+    <h3>{{ r.title }}</h3>
+    <p>{{ r.donor_org or r.donor_name }}, {{ r.address }}</p>
+  </div>
+  <div class="ticket-meta">
+    <span class="servings">{{ r.servings }} servings</span>
+    <span class="diet {{ 'veg' if r.is_veg else 'nonveg' }}">{{ 'Veg' if r.is_veg else 'Non-veg' }}</span>
+    {% if show_distance and r.distance_km is not none %}<span>{{ r.distance_km }} km away</span>{% endif %}
+    <span class="left {{ 'urgent' if m < 60 else '' }}">{{ r.expires_at|time_left }}</span>
+  </div>
+</a>
+{% endmacro %}

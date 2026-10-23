@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Post surplus food - FoodRescue Connect{% endblock %}
+{% block content %}
+<section class="form-card wide">
+  <h1>Post surplus food</h1>
+  <form method="post" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>What is it? <input name="title" placeholder="Veg biryani and raita" value="{{ request.form.title }}" required></label>
+    <div class="row">
+      <label>Food type
+        <select name="food_type" required>
+          {% for t in food_types %}<option {{ 'selected' if request.form.food_type == t }}>{{ t }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>Servings <input type="number" name="servings" min="1" value="{{ request.form.servings }}" required></label>
+    </div>
+    <label class="check"><input type="checkbox" name="is_veg" value="1" {{ 'checked' if request.method == 'GET' or request.form.is_veg }}> Vegetarian</label>
+    <label>Pickup address <input name="address" value="{{ request.form.address }}" required></label>
+    <div class="row">
+      <label>Prepared at <input type="datetime-local" name="prepared_at" value="{{ request.form.prepared_at or now }}" required></label>
+      <label>Collect by <input type="datetime-local" name="expires_at" value="{{ request.form.expires_at }}" required></label>
+    </div>
+    <div class="geo">
+      <input type="hidden" name="lat" id="lat" value="{{ request.form.lat }}">
+      <input type="hidden" name="lng" id="lng" value="{{ request.form.lng }}">
+      <button type="button" class="btn btn-ghost" data-geo>Pin this location on the map</button>
+      <span class="hint" id="geo-status">Optional. Your account location is used if you skip this.</span>
+    </div>
+    <label>Notes for the NGO <textarea name="notes" rows="3" placeholder="Containers provided? Gate or floor details?">{{ request.form.notes }}</textarea></label>
+    <button class="btn" type="submit">Post listing</button>
+  </form>
+</section>
+{% endblock %}

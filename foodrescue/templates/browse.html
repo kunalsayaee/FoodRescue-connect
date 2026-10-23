@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% from "_macros.html" import listing_row %}
+{% block title %}Find food - FoodRescue Connect{% endblock %}
+{% block head %}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+{% endblock %}
+{% block content %}
+<h1>Food available to collect</h1>
+<form class="filters" method="get">
+  <label class="check"><input type="checkbox" name="veg" value="1" {{ 'checked' if veg_only }} onchange="this.form.submit()"> Vegetarian only</label>
+  <label>Sort by
+    <select name="sort" onchange="this.form.submit()">
+      <option value="expiry" {{ 'selected' if sort == 'expiry' }}>Collect-by time</option>
+      {% if has_location %}<option value="distance" {{ 'selected' if sort == 'distance' }}>Distance from me</option>{% endif %}
+    </select>
+  </label>
+</form>
+
+{% if markers %}
+  <div id="map" class="map" role="img" aria-label="Map of available food listings"></div>
+  <script id="markers-data" type="application/json">{{ markers|tojson }}</script>
+{% endif %}
+
+{% if rows %}
+  <div class="tickets">
+    {% for r in rows %}{{ listing_row(r, show_distance=True) }}{% endfor %}
+  </div>
+{% else %}
+  <p class="empty">No open listings match right now. Check back soon.</p>
+{% endif %}
+{% endblock %}

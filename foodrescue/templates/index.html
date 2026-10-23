@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% from "_macros.html" import listing_row %}
+{% block content %}
+<section class="hero">
+  <h1>Surplus food has a deadline. So does hunger.</h1>
+  <p class="lead">Restaurants, caterers and hostels post what is left over. Nearby NGOs and volunteers claim it, collect it and get it to people who need a meal today.</p>
+  <div class="actions">
+    {% if g.user %}
+      <a class="btn" href="{{ url_for('main.dashboard') }}">Go to dashboard</a>
+    {% else %}
+      <a class="btn" href="{{ url_for('auth.register', role='donor') }}">I have food to donate</a>
+      <a class="btn btn-ghost" href="{{ url_for('auth.register', role='ngo') }}">I collect food for others</a>
+    {% endif %}
+  </div>
+</section>
+
+<section class="board">
+  <h2>Waiting for pickup right now</h2>
+  {% if rows %}
+    <div class="tickets">
+      {% for r in rows %}{{ listing_row(r) }}{% endfor %}
+    </div>
+  {% else %}
+    <p class="empty">Nothing is waiting at the moment. Donors can post surplus food from their dashboard.</p>
+  {% endif %}
+</section>
+
+<section class="impact">
+  <dl>
+    <div><dt>Servings delivered</dt><dd>{{ stats.delivered }}</dd></div>
+    <div><dt>On the way</dt><dd>{{ stats.in_transit }}</dd></div>
+    <div><dt>Waiting for an NGO</dt><dd>{{ stats.waiting }}</dd></div>
+  </dl>
+</section>
+
+<section class="steps">
+  <h2>How it works</h2>
+  <ol>
+    <li><strong>Post.</strong> A donor lists the food, quantity, pickup address and a collect-by time.</li>
+    <li><strong>Claim.</strong> An NGO sees open listings sorted by distance and deadline, and claims one.</li>
+    <li><strong>Collect.</strong> The NGO marks the food as picked up, then delivered.</li>
+    <li><strong>Count.</strong> Every delivered serving is added to the donor's and NGO's totals.</li>
+  </ol>
+</section>
+{% endblock %}

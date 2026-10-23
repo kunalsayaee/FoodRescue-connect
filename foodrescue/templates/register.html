@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Join - FoodRescue Connect{% endblock %}
+{% block content %}
+<section class="form-card">
+  <h1>Create your account</h1>
+  <form method="post" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <fieldset class="choice">
+      <legend>I want to</legend>
+      <label><input type="radio" name="role" value="donor" {{ 'checked' if request.args.get('role') != 'ngo' }} required> Donate surplus food</label>
+      <label><input type="radio" name="role" value="ngo" {{ 'checked' if request.args.get('role') == 'ngo' }}> Collect food for others</label>
+    </fieldset>
+    <label>Your name <input name="name" value="{{ request.form.name }}" required></label>
+    <label>Organization (restaurant, NGO, hostel) <input name="organization" value="{{ request.form.organization }}"></label>
+    <label>Email <input type="email" name="email" value="{{ request.form.email }}" required></label>
+    <label>Password (8+ characters) <input type="password" name="password" minlength="8" required></label>
+    <label>Phone <input name="phone" value="{{ request.form.phone }}"></label>
+    <label>City <input name="city" value="{{ request.form.city }}"></label>
+    <div class="geo">
+      <input type="hidden" name="lat" id="lat" value="{{ request.form.lat }}">
+      <input type="hidden" name="lng" id="lng" value="{{ request.form.lng }}">
+      <button type="button" class="btn btn-ghost" data-geo>Use my location</button>
+      <span class="hint" id="geo-status">Optional. Lets NGOs sort food by distance.</span>
+    </div>
+    <button class="btn" type="submit">Create account</button>
+  </form>
+  <p class="aside">Already registered? <a href="{{ url_for('auth.login') }}">Log in</a></p>
+</section>
+{% endblock %}

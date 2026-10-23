@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge %}
+{% block title %}Dashboard - FoodRescue Connect{% endblock %}
+{% block content %}
+<h1>{{ g.user.organization or g.user.name }}</h1>
+<p class="lead small">
+  {% if g.user.role == 'donor' %}
+    {{ saved }} servings of your surplus food have reached people so far.
+  {% else %}
+    You have delivered {{ saved }} servings so far.
+  {% endif %}
+</p>
+<div class="actions">
+  {% if g.user.role == 'donor' %}
+    <a class="btn" href="{{ url_for('main.new_listing') }}">Post surplus food</a>
+  {% else %}
+    <a class="btn" href="{{ url_for('main.browse') }}">Find food to collect</a>
+  {% endif %}
+</div>
+
+<h2>{{ 'Your listings' if g.user.role == 'donor' else 'Your claimed pickups' }}</h2>
+{% if rows %}
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Food</th><th>Servings</th><th>Collect by</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr>
+      <td><a href="{{ url_for('main.detail', listing_id=r.id) }}">{{ r.title }}</a></td>
+      <td>{{ r.servings }}</td>
+      <td>{{ r.expires_at|pretty_dt }}</td>
+      <td>{{ badge(r.status) }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+  <p class="empty">
+    {% if g.user.role == 'donor' %}You have not posted anything yet.{% else %}You have not claimed any food yet.{% endif %}
+  </p>
+{% endif %}
+{% endblock %}

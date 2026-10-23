@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% from "_macros.html" import badge %}
+{% block title %}{{ r.title }} - FoodRescue Connect{% endblock %}
+{% block content %}
+<article class="detail">
+  <header>
+    <h1>{{ r.title }}</h1>
+    {{ badge(r.status) }}
+  </header>
+  <dl class="facts">
+    <div><dt>Servings</dt><dd>{{ r.servings }}</dd></div>
+    <div><dt>Type</dt><dd>{{ r.food_type }}, {{ 'vegetarian' if r.is_veg else 'non-vegetarian' }}</dd></div>
+    <div><dt>Donor</dt><dd>{{ r.donor_org or r.donor_name }}</dd></div>
+    <div><dt>Pickup address</dt><dd>{{ r.address }}</dd></div>
+    <div><dt>Prepared</dt><dd>{{ r.prepared_at|pretty_dt }}</dd></div>
+    <div><dt>Collect by</dt><dd>{{ r.expires_at|pretty_dt }}{% if r.status == 'posted' %} ({{ r.expires_at|time_left }}){% endif %}</dd></div>
+    {% if r.claimed_by %}<div><dt>Claimed by</dt><dd>{{ r.ngo_org or r.ngo_name }}</dd></div>{% endif %}
+    {% if show_phone %}<div><dt>Donor phone</dt><dd>{{ r.donor_phone or 'Not provided' }}</dd></div>{% endif %}
+    {% if r.notes %}<div><dt>Notes</dt><dd>{{ r.notes }}</dd></div>{% endif %}
+  </dl>
+
+  <ol class="progress" aria-label="Pickup progress">
+    {% for s in ['posted', 'claimed', 'picked_up', 'delivered'] %}
+      {% set order = ['posted', 'claimed', 'picked_up', 'delivered'] %}
+      <li class="{{ 'done' if r.status in order and order.index(r.status) >= loop.index0 }}">{{ s|replace('_', ' ') }}</li>
+    {% endfor %}
+  </ol>
+
+  <div class="actions">
+    {% if g.user.role == 'ngo' and r.status == 'posted' %}
+      <form method="post" action="{{ url_for('main.claim', listing_id=r.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn" type="submit">Claim this food</button>
+      </form>
+    {% endif %}
+    {% if is_claimer and next_status %}
+      <form method="post" action="{{ url_for('main.advance', listing_id=r.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn" type="submit">Mark as {{ next_status|replace('_', ' ') }}</button>
+      </form>
+    {% endif %}
+    {% if is_claimer and r.status == 'claimed' %}
+      <form method="post" action="{{ url_for('main.release', listing_id=r.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn btn-ghost" type="submit">Release claim</button>
+      </form>
+    {% endif %}
+    {% if is_owner and r.status == 'posted' %}
+      <form method="post" action="{{ url_for('main.cancel', listing_id=r.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn btn-danger" type="submit">Cancel listing</button>
+      </form>
+    {% endif %}
+  </div>
+</article>
+{% endblock %}
